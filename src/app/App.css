@@ -1,0 +1,9 @@
+.app {
+    position: relative;
+    flex: 1;
+}
+
+.app nav {
+    position: fixed;
+    bottom: 0;
+}

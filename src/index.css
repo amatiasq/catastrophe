@@ -1,0 +1,23 @@
+html {
+    height: 100%;
+    display: flex;
+}
+
+body {
+    position: relative;
+    flex: 1;
+    margin: 0;
+    padding: 0;
+    font-family: sans-serif;
+}
+
+#canvas > canvas, #root {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+}
+
+#canvas > canvas {
+    top: 0;
+    right: 0;
+}
