@@ -1,23 +1,31 @@
 import Color from '../../geometry/color';
-import Sprite from '../sprite';
-import Renderer from '../renderer';
-import Vector from '../../geometry/vector';
+import { TAU } from '../../geometry/math';
 import Game from '../game';
+import Sprite from '../sprite';
+import TaskManager, { Task, TaskWorker } from '../tasks/index';
 
-const SINGLE_TILE = Vector.of(1, 1);
+export default class Entity extends Sprite implements TaskWorker {
 
-export default class Entity extends Sprite {
+    task: Task;
 
-    constructor(pos: Vector, size = SINGLE_TILE) {
-        super(pos, size);
+    assignTask(task: Task): void {
+        this.task = task;
     }
 
-    _render(context: CanvasRenderingContext2D, renderer: Renderer, game: Game): void {
+    update(tasks: TaskManager): void {
+        if (this.task) {
+            this.task.step(this);
+        }
+    }
+
+    _render(context: Renderer2D, game: Game): void {
         const center = game.tileSize.divideValue(2);
 
+        context.beginPath();
         context.strokeStyle = Color.GREEN.toString();
-        context.arc(center.x, center.y, Math.min(center.x, center.y) - 2, 0, Math.TAU);
+        context.arc(center.x, center.y, Math.min(center.x, center.y) - 3, 0, TAU);
         context.stroke();
+        context.closePath();
     }
 
 }

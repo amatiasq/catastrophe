@@ -4,6 +4,8 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import App from './app/App';
 import Game from './game/game';
+import Entity from './game/world/entity';
+import Vector from './geometry/vector';
 import registerServiceWorker from './registerServiceWorker';
 
 ReactDOM.render(
@@ -16,6 +18,8 @@ const game = new Game(
   document.getElementById('background') as Canvas,
   document.getElementById('foreground') as Canvas,
 );
+
+game.addEntity(new Entity(Vector.ZERO));
 
 game.start();
 

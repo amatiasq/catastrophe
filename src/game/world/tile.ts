@@ -1,27 +1,40 @@
 import Color from '../../geometry/color';
+import Rectangle from '../../geometry/rectangle';
 import Vector from '../../geometry/vector';
 import property from '../../meta/property';
+import Game from '../game';
 import Sprite from '../sprite';
+import Entity from './entity';
 
 export default class Tile extends Sprite {
 
     onChange: () => void;
+    entities = new Set<Entity>();
+    view: Rectangle;
 
     @property
-    isEnabled = true;
+    isEnabled = false;
 
     @property
     isHover = false;
 
     constructor(
-        pos: Vector,
+        private game: Game,
+        public pos: Vector,
         size: Vector,
-        public coords: Vector
     ) {
-        super(pos, size);
+        super(pos);
+
+        this.view = new Rectangle(pos.multiply(size), size);
     }
 
     _render(context: Renderer2D): void {
+        context.translate(this.view.x, this.view.y);
+        this.drawTile(context);
+        this.drawEntities(context);
+    }
+
+    private drawTile(context: Renderer2D) {
         let color = Color.BLACK;
 
         if (this.isHover) {
@@ -34,9 +47,14 @@ export default class Tile extends Sprite {
         context.fillStyle = color.toString();
 
         context.beginPath();
-        context.rect(0, 0, this.width, this.height);
+        context.rect(0, 0, this.view.width, this.view.height);
         context.fill();
         context.stroke();
         context.closePath();
     }
+
+    private drawEntities(context: Renderer2D) {
+        this.entities.forEach(entity => entity.render(context, this.game));
+    }
+
 }

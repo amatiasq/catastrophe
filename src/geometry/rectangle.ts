@@ -1,6 +1,6 @@
 import Vector from './vector';
 
-export default class Rectangle {
+export default class Rectangle implements Iterable<Vector> {
 
     get x() {
         return this.pos.x;
@@ -63,8 +63,42 @@ export default class Rectangle {
         return px > x && px < endX && py > y && py < endY;
     }
 
+    clamp(limit: Rectangle) {
+        const { x, y, endX, endY } = this;
+        const {
+            x: limitX,
+            y: limitY,
+            endX: limitEndX,
+            endY: limitEndY,
+        } = limit;
+        const isXOut = x < limitX;
+        const isYOut = y < limitY;
+        const isWidthOut = endX > limitEndX;
+        const isHeightOut = endY > limitEndY;
+
+        if (isXOut || isYOut) {
+            this.pos = Vector.of(
+                isXOut ? limitX : x,
+                isYOut ? limitY : y,
+            );
+        }
+
+        if (isWidthOut || isHeightOut) {
+            this.size = Vector.of(
+                isWidthOut ? limitEndX - x : this.width,
+                isHeightOut ? limitEndY - y : this.height,
+            );
+        }
+    }
+
     toString() {
         return `[Rectangle(${this.x}, ${this.y}, ${this.width}, ${this.height})]`;
+    }
+
+    *[Symbol.iterator]() {
+        for (const vector of Vector.iterate(this.pos, this.end)) {
+            yield vector;
+        }
     }
 
     private fixCoords() {

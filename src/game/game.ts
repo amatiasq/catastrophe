@@ -3,18 +3,27 @@ import Vector from '../geometry/vector';
 import Camera from './camera';
 import Player from './player';
 import Renderer from './renderer';
+import TaskManager from './tasks/index';
+import Ticker from './ticker';
 import Entity from './world/entity';
 import Grid from './world/grid';
 
 export default class Game {
 
-    renderer: Renderer;
-    player: Player;
-    isRunning = false;
+    delta = 0;
+    deltaSeconds = 0;
     tileSize = Vector.of(16, 16);
-    grid = new Grid(Vector.of(32, 32), this.tileSize);
-    camera = new Camera(Vector.ZERO, Vector.ZERO);
-    entities = {} as { [index: string]: Entity[] };
+
+    player: Player;
+    renderer: Renderer;
+    tasks = new TaskManager();
+    ticker = new Ticker(this.onTick);
+    grid = new Grid(this, Vector.of(32, 32), this.tileSize);
+    camera = new Camera(this, Vector.ZERO, Vector.ZERO);
+
+    get isRunning()  {
+        return this.ticker.isRunning;
+    }
 
     constructor(
         canvas: Canvas,
@@ -23,53 +32,47 @@ export default class Game {
     ) {
         this.renderer = new Renderer(this, canvas, background, foreground);
         this.player = new Player(this, foreground);
-
-        this.entities[Vector.ZERO.toString()] = [new Entity(Vector.ZERO, Vector.of(16, 16))];
     }
 
     start() {
-        this.isRunning = true;
-        this.onTick();
+        this.ticker.start();
     }
 
-    // pointToCoordinates(point: Vector, ceil = false) {
-    //     return this.grid.pointToCoordinates(point, ceil);
-    // }
-
-    // areaToCoordinates(area: Rectangle) {
-    //     return new Rectangle(
-    //         this.grid.pointToCoordinates(area.pos),
-    //         this.grid.pointToCoordinates(area.size, true),
-    //     );
-    // }
+    addEntity(entity: Entity) {
+        this.grid.addEntity(entity);
+        this.tasks.addIdle(entity);
+    }
 
     getEntitiesAt(coords: Vector): Entity[] {
-        const map = this.entities[coords.toString()];
-        return map ? Object.values(map) : [];
+        return [...this.grid.getTileAt(coords).entities];
+    }
+
+    moveEntity(entity: Entity, target: Vector) {
+        this.grid.moveEntity(entity, target);
     }
 
     getVisibleTiles() {
-        return this.grid
-            .getPositionsAt(this.camera)
-            .map(coords => this.grid.getTileAt(coords));
-    }
-
-    getVisibleEntitiesByDepth(): Entity[] {
-        return this.grid
-            .getPositionsAt(this.camera)
-            .reduce((result, coords) => {
-                const entries = this.getEntitiesAt(coords);
-                return entries.length ? result.concat(entries) : result;
-            }, []);
+        return this.camera.getVisibleTiles();
     }
 
     @bind
-    private onTick() {
-        this.renderer.renderFrame();
+    private onTick(delta: number, seconds: number) {
+        this.delta = delta;
+        this.deltaSeconds = seconds;
 
-        if (this.isRunning) {
-            requestAnimationFrame(this.onTick);
+        for (const entity of this.grid.getAllEntities()) {
+            if (!entity.task) {
+                this.tasks.addIdle(entity);
+            }
         }
+
+        this.tasks.assign();
+
+        for (const entity of this.camera.getVisibleEntities()) {
+            entity.update(this.tasks);
+        }
+
+        this.renderer.renderFrame();
     }
 
 }

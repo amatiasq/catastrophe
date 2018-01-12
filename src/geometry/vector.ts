@@ -5,6 +5,7 @@ const round = Round.curry(2);
 
 export default class Vector implements Vector, Iterable<Vector> {
     static ZERO = Vector.of(0, 0);
+    static ONE = Vector.of(1, 1);
     static MAX = Vector.of(Infinity, Infinity);
 
     static from(value: object, xProp = 'x', yProp = 'y') {

@@ -4,7 +4,6 @@
   "private": true,
   "dependencies": {
     "amq-tools": "^3.0.2",
-    "paper": "^0.11.5",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
     "react-scripts-ts": "2.8.0"
@@ -18,7 +17,6 @@
   "devDependencies": {
     "@types/jest": "^22.0.1",
     "@types/node": "^9.3.0",
-    "@types/paper": "^0.9.11",
     "@types/react": "^16.0.34",
     "@types/react-dom": "^16.0.3",
     "bind-decorator": "^1.0.11"

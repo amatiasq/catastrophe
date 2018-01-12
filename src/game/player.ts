@@ -2,6 +2,8 @@ import { bind } from 'bind-decorator';
 import Rectangle from '../geometry/rectangle';
 import Vector from '../geometry/vector';
 import Game from './game';
+import TaskWallBuild from './tasks/wall-build';
+import Tile from './world/tile';
 
 export default class Player {
 
@@ -17,17 +19,19 @@ export default class Player {
     }
 
     onClick(event: MouseEvent, point = Vector.from(event)) {
-        const { grid } = this.game;
-        const tile = grid.getTileAt(grid.pointToCoordinates(point));
-        tile.isEnabled = !tile.isEnabled;
+        const { grid, tasks } = this.game;
+        const coords = grid.getCoordsFromPoint(point);
+
+        tasks.addTask(new TaskWallBuild(this.game, new Rectangle(coords, Vector.ONE)));
+
+        // const { grid } = this.game;
+        // const tile = grid.getTileAt();
+        // tile.isEnabled = !tile.isEnabled;
     }
 
     onDragEnd(area: Rectangle) {
-        this.resetHover();
-
-        for (const tile of this.getTilesAtCoords(area)) {
-            tile.isEnabled = !tile.isEnabled;
-        }
+        const { grid, tasks } = this.game;
+        tasks.addTask(new TaskWallBuild(this.game, grid.getCoordsFromArea(area)));
     }
 
     @bind
@@ -47,6 +51,7 @@ export default class Player {
         this.dragStart = null;
 
         if (this.isDragging) {
+            this.resetHover();
             this.onDragEnd(area);
         } else {
             this.onClick(event, end);
@@ -72,12 +77,15 @@ export default class Player {
         }
     }
 
-    private getTilesAtCoords(area: Rectangle) {
+    private getTilesAtCoords(area: Rectangle): Tile[] {
         const { grid } = this.game;
+        const result = [];
 
-        return grid
-            .getPositionsAt(area)
-            .map(coords => grid.getTileAt(coords));
+        for (const coords of grid.getCoordsFromArea(area)) {
+            result.push(grid.getTileAt(coords));
+        }
+
+        return result;
     }
 
 }

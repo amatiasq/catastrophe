@@ -46,7 +46,6 @@ export default class Renderer {
         // this.drawOccupiedCells();
         // this.drawPathingCells();
         this.drawTiles();
-        this.drawEntities();
         // this.drawCombatInfo();
         // this.drawHighTiles(this.context);
         this.context.restore();
@@ -62,13 +61,7 @@ export default class Renderer {
 
     drawTiles() {
         for (const tile of this.game.getVisibleTiles()) {
-            tile.render(this.background, this, this.game);
-        }
-    }
-
-    drawEntities() {
-        for (const entity of this.game.getVisibleEntitiesByDepth()) {
-            entity.render(this.context, this, this.game);
+            tile.render(this.background, this.game);
         }
     }
 
