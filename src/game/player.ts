@@ -31,7 +31,8 @@ export default class Player {
 
     onDragEnd(area: Rectangle) {
         const { grid, tasks } = this.game;
-        tasks.addTask(new TaskWallBuild(this.game, grid.getCoordsFromArea(area)));
+        const task = (window as any).catastrophe.tool;
+        tasks.addTask(new task(this.game, grid.getCoordsFromArea(area)));
     }
 
     @bind
