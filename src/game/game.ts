@@ -11,7 +11,8 @@ export default class Game {
     renderer: Renderer;
     player: Player;
     isRunning = false;
-    grid = new Grid(Vector.of(32, 32), Vector.of(16, 16));
+    tileSize = Vector.of(16, 16);
+    grid = new Grid(Vector.of(32, 32), this.tileSize);
     camera = new Camera(Vector.ZERO, Vector.ZERO);
     entities = {} as { [index: string]: Entity[] };
 
@@ -22,6 +23,8 @@ export default class Game {
     ) {
         this.renderer = new Renderer(this, canvas, background, foreground);
         this.player = new Player(this, foreground);
+
+        this.entities[Vector.ZERO.toString()] = [new Entity(Vector.ZERO, Vector.of(16, 16))];
     }
 
     start() {

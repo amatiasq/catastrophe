@@ -62,13 +62,13 @@ export default class Renderer {
 
     drawTiles() {
         for (const tile of this.game.getVisibleTiles()) {
-            tile.render(this.background, this);
+            tile.render(this.background, this, this.game);
         }
     }
 
     drawEntities() {
         for (const entity of this.game.getVisibleEntitiesByDepth()) {
-            entity.render(this.context, this);
+            entity.render(this.context, this, this.game);
         }
     }
 
