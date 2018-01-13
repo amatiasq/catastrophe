@@ -20,7 +20,8 @@ export default class App extends React.Component<AppProps, AppState> {
   constructor(props: AppProps) {
     super(props);
 
-    (window as any).catastrophe = this.state = {};
+    (window as any).tool = TOOLS[0]
+    this.state = { tool: TOOLS[0] };
   }
 
   render() {

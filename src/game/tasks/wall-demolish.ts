@@ -60,7 +60,6 @@ export default class TaskWallDemolish implements Task {
             this.workingTile = null;
             this._isCompleted = true;
             this.worker.assignTask(null);
-            console.log(`Demolished wall for: ${this.area}`);
             return;
         }
 
@@ -71,7 +70,6 @@ export default class TaskWallDemolish implements Task {
             return;
         }
 
-        console.log(`Tile demolition finished, moving from ${this.workingTile} to ${value}`);
         this.workingTile = value;
         this.remaining = SECONDS_PER_WALL;
         this.game.moveEntity(this.worker, value);

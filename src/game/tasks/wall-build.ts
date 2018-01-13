@@ -60,7 +60,6 @@ export default class TaskWallBuild implements Task {
             this.workingTile = null;
             this._isCompleted = true;
             this.worker.assignTask(null);
-            console.log(`Completed wall for: ${this.area}`);
             return;
         }
 
@@ -71,7 +70,6 @@ export default class TaskWallBuild implements Task {
             return;
         }
 
-        console.log(`Tile finished, moving from ${this.workingTile} to ${value}`);
         this.workingTile = value;
         this.remaining = SECONDS_PER_WALL;
         this.game.moveEntity(this.worker, value);

@@ -2,7 +2,6 @@ import { bind } from 'bind-decorator';
 import Rectangle from '../geometry/rectangle';
 import Vector from '../geometry/vector';
 import Game from './game';
-import TaskWallBuild from './tasks/wall-build';
 import Tile from './world/tile';
 
 export default class Player {
@@ -18,21 +17,21 @@ export default class Player {
         element.addEventListener('mouseup', this.onMouseUp);
     }
 
+    get task() {
+        return (window as any).tool.class;
+    }
+
     onClick(event: MouseEvent, point = Vector.from(event)) {
         const { grid, tasks } = this.game;
         const coords = grid.getCoordsFromPoint(point);
 
-        tasks.addTask(new TaskWallBuild(this.game, new Rectangle(coords, Vector.ONE)));
-
-        // const { grid } = this.game;
-        // const tile = grid.getTileAt();
-        // tile.isEnabled = !tile.isEnabled;
+        tasks.addTask(new this.task(this.game, new Rectangle(coords, Vector.ONE)));
     }
 
     onDragEnd(area: Rectangle) {
         const { grid, tasks } = this.game;
-        const task = (window as any).catastrophe.tool;
-        tasks.addTask(new task(this.game, grid.getCoordsFromArea(area)));
+
+        tasks.addTask(new this.task(this.game, grid.getCoordsFromArea(area)));
     }
 
     @bind
