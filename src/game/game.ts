@@ -18,7 +18,7 @@ export default class Game {
     renderer: Renderer;
     tasks = new TaskManager();
     ticker = new Ticker(this.onTick);
-    grid = new Grid(this, Vector.of(32, 32), this.tileSize);
+    grid = new Grid(this, Vector.of(100, 100), this.tileSize);
     camera = new Camera(this, Vector.ZERO, Vector.ZERO);
 
     get isRunning()  {

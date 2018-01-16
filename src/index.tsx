@@ -20,6 +20,10 @@ const game = new Game(
 );
 
 game.addEntity(new Entity(Vector.ZERO));
+game.addEntity(new Entity(Vector.ZERO));
+game.addEntity(new Entity(Vector.ZERO));
+game.addEntity(new Entity(Vector.ZERO));
+game.addEntity(new Entity(Vector.ZERO));
 
 game.start();
 
