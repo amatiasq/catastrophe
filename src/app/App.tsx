@@ -20,7 +20,7 @@ export default class App extends React.Component<AppProps, AppState> {
   constructor(props: AppProps) {
     super(props);
 
-    (window as any).tool = TOOLS[0]
+    (window as any).tool = TOOLS[0];
     this.state = { tool: TOOLS[0] };
   }
 
@@ -55,7 +55,7 @@ export default class App extends React.Component<AppProps, AppState> {
 
 }
 
-interface AppProps {}
+interface AppProps { }
 
 interface AppState {
   tool?: Tool;

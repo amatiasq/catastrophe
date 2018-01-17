@@ -266,7 +266,7 @@ module.exports = {
       uglifyOptions: {
         ie8: false,
         ecma: 6,
-        warnings: true,
+        warnings: false,
         mangle: true, // debug false
         output: {
           comments: false,
