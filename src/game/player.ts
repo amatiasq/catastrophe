@@ -1,12 +1,13 @@
 import { bind } from 'bind-decorator';
 import Rectangle from '../geometry/rectangle';
 import Vector from '../geometry/vector';
+import notNull from '../meta/not-null';
 import Game from './game';
 import Tile from './world/tile';
 
 export default class Player {
 
-    private dragStart: Vector = null;
+    private dragStart: Vector | null = null;
     private isDragging = false;
 
     constructor(
@@ -25,13 +26,15 @@ export default class Player {
         const { grid, tasks } = this.game;
         const coords = grid.getCoordsFromPoint(point);
 
-        tasks.addTask(new this.task(this.game, new Rectangle(coords, Vector.ONE)));
+        tasks.addTask(new this.task(this.game, grid.getRange(coords, Vector.ONE)));
     }
 
     onDragEnd(area: Rectangle) {
         const { grid, tasks } = this.game;
+        const rectangle = grid.getCoordsFromArea(area);
+        const range = grid.getRangeFromRectangle(rectangle);
 
-        tasks.addTask(new this.task(this.game, grid.getCoordsFromArea(area)));
+        tasks.addTask(new this.task(this.game, range));
     }
 
     @bind
@@ -46,11 +49,12 @@ export default class Player {
     private onMouseUp(event: MouseEvent) {
         this.element.removeEventListener('mousemove', this.onMouseMove);
 
+        const start = notNull(this.dragStart);
         const end = Vector.from(event);
-        const area = new Rectangle(this.dragStart, end.sustract(this.dragStart));
+        const area = new Rectangle(start, end.sustract(start));
         this.dragStart = null;
 
-        if (this.isDragging) {
+        if (this.isDragging && !area.size.isZero) {
             this.resetHover();
             this.onDragEnd(area);
         } else {
@@ -63,8 +67,9 @@ export default class Player {
         this.isDragging = true;
         this.resetHover();
 
+        const start = notNull(this.dragStart);
         const end = Vector.from(event);
-        const area = new Rectangle(this.dragStart, end.sustract(this.dragStart));
+        const area = new Rectangle(start, end.sustract(start));
 
         for (const tile of this.getTilesAtCoords(area)) {
             tile.isHover = true;
@@ -79,10 +84,14 @@ export default class Player {
 
     private getTilesAtCoords(area: Rectangle): Tile[] {
         const { grid } = this.game;
-        const result = [];
+        const result: Tile[] = [];
 
         for (const coords of grid.getCoordsFromArea(area)) {
-            result.push(grid.getTileAt(coords));
+            const tile = grid.getAt(coords);
+
+            if (tile) {
+                result.push(tile);
+            }
         }
 
         return result;

@@ -19,11 +19,11 @@ const game = new Game(
   document.getElementById('foreground') as Canvas,
 );
 
-game.addEntity(new Entity(Vector.ZERO));
-game.addEntity(new Entity(Vector.ZERO));
-game.addEntity(new Entity(Vector.ZERO));
-game.addEntity(new Entity(Vector.ZERO));
-game.addEntity(new Entity(Vector.ZERO));
+game.addEntity(new Entity(game, Vector.ZERO));
+game.addEntity(new Entity(game, Vector.ZERO));
+game.addEntity(new Entity(game, Vector.ZERO));
+game.addEntity(new Entity(game, Vector.ZERO));
+game.addEntity(new Entity(game, Vector.ZERO));
 
 game.start();
 

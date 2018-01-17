@@ -1,5 +1,6 @@
 import { bind } from 'bind-decorator';
 import Vector from '../geometry/vector';
+import notNull from '../meta/not-null';
 import Camera from './camera';
 import Game from './game';
 
@@ -7,9 +8,9 @@ export default class Renderer {
     scale = 1;
     size = Vector.ZERO;
     camera: Camera;
-    context: Renderer2D;
-    background: Renderer2D;
-    foreground: Renderer2D;
+    readonly context: Renderer2D;
+    readonly background: Renderer2D;
+    readonly foreground: Renderer2D;
     private shouldUpdateSize = false;
 
     constructor(
@@ -19,9 +20,9 @@ export default class Renderer {
         private forecanvas: Canvas,
     ) {
         this.camera = game.camera;
-        this.context = canvas.getContext('2d');
-        this.background = backcanvas.getContext('2d');
-        this.foreground = forecanvas.getContext('2d');
+        this.context = notNull(canvas.getContext('2d'));
+        this.background = notNull(backcanvas.getContext('2d'));
+        this.foreground = notNull(forecanvas.getContext('2d'));
 
         window.addEventListener('resize', this.onResize);
         this.onResize();

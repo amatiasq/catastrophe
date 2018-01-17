@@ -7,6 +7,7 @@ export default class Vector implements Vector, Iterable<Vector> {
     static ZERO = Vector.of(0, 0);
     static ONE = Vector.of(1, 1);
     static MAX = Vector.of(Infinity, Infinity);
+    static round = round;
 
     static from(value: object, xProp = 'x', yProp = 'y') {
         return Vector.of(value[xProp], value[yProp]);
@@ -172,6 +173,11 @@ export default class Vector implements Vector, Iterable<Vector> {
 
     some(operation: VectorTest): boolean {
         return operation(this.x, 'x', this) || operation(this.y, 'y', this);
+    }
+
+    simpleDistance(target: Vector) {
+        const diff = this.sustract(target).map(Math.abs);
+        return diff.x + diff.y;
     }
 
     copyTo(object: { x: number, y: number }) {

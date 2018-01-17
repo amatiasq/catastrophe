@@ -1,7 +1,6 @@
 import { bind } from 'bind-decorator';
+import { FRAMES_PER_SECOND, MILLISECONDS_PER_SECOND } from '../constants';
 
-const MILLISECONDS_PER_SECOND = 1000;
-const FRAMES_PER_SECOND = 60;
 const MILLISECONDS_PER_FRAME = MILLISECONDS_PER_SECOND / FRAMES_PER_SECOND;
 
 export default class Ticker {
