@@ -28,7 +28,9 @@ export default class Grid extends Area {
                 row = tiles[coords.y] = [];
             }
 
-            row[coords.x] = new Tile(game, coords, tileSize, diagonalMovementCost);
+            const tile = new Tile(game, coords, tileSize, diagonalMovementCost);
+            tile.onChange = () => game.pathfinding.recalculate(tile);
+            row[coords.x] = tile;
         }
 
         super(tiles);

@@ -1,5 +1,5 @@
 import { bind } from 'bind-decorator';
-import { CLOSER_MODIFIER, CLUSTER_SIZE, DIAGONAL_MOVEMENT_COST, TILE_SIZE } from '../constants';
+import { CLOSER_MODIFIER, CLUSTER_SIZE, DIAGONAL_MOVEMENT_COST, MAP_SIZE, TILE_SIZE } from '../constants';
 import Vector from '../geometry/vector';
 import notNull from '../meta/not-null';
 import Camera from './camera';
@@ -23,7 +23,7 @@ export default class Game {
     renderer: Renderer;
     tasks = new TaskManager();
     ticker = new Ticker(this.onTick);
-    grid = new Grid(this, Vector.of(100, 100), this.tileSize, DIAGONAL_MOVEMENT_COST);
+    grid = new Grid(this, Vector.of(MAP_SIZE, MAP_SIZE), this.tileSize, DIAGONAL_MOVEMENT_COST);
     camera = new Camera(this, Vector.ZERO, Vector.ZERO);
     pathfinding = new Pathfinding(
         this.grid,

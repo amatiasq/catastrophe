@@ -42,8 +42,10 @@ export default class Entity extends Sprite implements TaskWorker {
         const center = this.game.tileSize.divideValue(2);
 
         context.beginPath();
+        context.fillStyle = Color.GREEN.toString();
         context.strokeStyle = Color.GREEN.toString();
         context.arc(center.x, center.y, Math.min(center.x, center.y) - 3, 0, TAU);
+        context.fill();
         context.stroke();
         context.closePath();
     }

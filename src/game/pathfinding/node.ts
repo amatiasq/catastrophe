@@ -1,4 +1,4 @@
-import { DEBUG_PATHFINDING_CLUSTERS } from '../../constants';
+import { DEBUG_PATHFINDING_CLUSTERS_NODES } from '../../constants';
 import Color from '../../geometry/color';
 import Vector from '../../geometry/vector';
 import notNull from '../../meta/not-null';
@@ -42,8 +42,8 @@ export class Node implements INode {
         this.children.add(child);
         this.sampleChild = child;
 
-        if (DEBUG_PATHFINDING_CLUSTERS) {
-            child.debugColor = Color.BROWN;
+        if (DEBUG_PATHFINDING_CLUSTERS_NODES) {
+            child.debugColor = Color.LIGHT_GREEN;
             child.debugContent = this.id;
         }
     }

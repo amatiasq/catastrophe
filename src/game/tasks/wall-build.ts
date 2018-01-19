@@ -134,7 +134,7 @@ export default class TaskWallBuild implements Task {
 
         this.workingCoords = tile.pos;
         this.remaining = SECONDS_PER_WALL;
-        this.walking = new TaskWalk(this.game, tile);
+        this.walking = new TaskWalk(this.game, new Area([[tile]]));
         this.walking.assign(worker);
         return true;
     }

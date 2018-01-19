@@ -2,6 +2,7 @@ import { DEBUG_PATHFINDING_ROUTES } from '../../constants';
 import Color from '../../geometry/color';
 import notNull from '../../meta/not-null';
 import Game from '../game';
+import Area from '../world/area';
 import Tile from '../world/tile';
 import { Task, TaskWorker } from './index';
 
@@ -15,6 +16,7 @@ export default class TaskWalk implements Task {
     private worker: TaskWorker | null = null;
     private currentTile = 0;
     private remainingCost = 0;
+    private readonly target: Tile;
 
     private _isCompleted = false;
     get isCompleted() {
@@ -23,8 +25,10 @@ export default class TaskWalk implements Task {
 
     constructor(
         private readonly game: Game,
-        public readonly target: Tile,
-    ) {}
+        target: Area,
+    ) {
+        this.target = notNull(target.get(0, 0));
+    }
 
     isValidWorker(worker: TaskWorker): number {
         const cost = this.pathfinding.getCost(notNull(worker.tile), this.target);

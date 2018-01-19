@@ -3,6 +3,7 @@ import './index.css';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import App from './app/App';
+import { TEST_ENTITIES } from './constants';
 import Game from './game/game';
 import Entity from './game/world/entity';
 import Vector from './geometry/vector';
@@ -19,11 +20,9 @@ const game = new Game(
   document.getElementById('foreground') as Canvas,
 );
 
-game.addEntity(new Entity(game, Vector.ZERO));
-game.addEntity(new Entity(game, Vector.ZERO));
-game.addEntity(new Entity(game, Vector.ZERO));
-game.addEntity(new Entity(game, Vector.ZERO));
-game.addEntity(new Entity(game, Vector.ZERO));
+for (let i = 0; i < TEST_ENTITIES; i++) {
+  game.addEntity(new Entity(game, Vector.ZERO));
+}
 
 game.start();
 
