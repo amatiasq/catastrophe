@@ -50,12 +50,12 @@ export default class Game {
 
     addEntity(entity: Entity) {
         this.grid.addEntity(entity);
-        this.tasks.addIdle(entity);
+        this.tasks.addWorker(entity);
     }
 
     removeEntity(entity: Entity) {
         this.grid.removeEntity(entity);
-        this.tasks.removeIdle(entity);
+        this.tasks.removeWorker(entity);
     }
 
     getEntitiesAt(coords: Vector): Entity[] {
@@ -75,20 +75,22 @@ export default class Game {
         this.delta = delta;
         this.deltaSeconds = seconds;
 
-        for (const entity of this.grid.getAllEntities()) {
-            if (!entity.task) {
-                this.tasks.addIdle(entity);
-            }
-        }
-
-        this.tasks.assign();
+        this.tasks.assignAll();
 
         for (const entity of this.camera.getVisibleEntities()) {
             entity.update(this.tasks);
         }
 
+        this.tasks.applyChanges();
         this.renderer.renderFrame();
         this.pathfinding.clearCache();
+
+        const { changedTiles } = this.grid;
+
+        if (changedTiles.size) {
+            changedTiles.forEach(tile => this.pathfinding.recalculate(tile));
+            changedTiles.clear();
+        }
     }
 
 }

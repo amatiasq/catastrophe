@@ -2,9 +2,11 @@ import './App.css';
 
 import { bind } from 'bind-decorator';
 import * as React from 'react';
-import TaskWalk from '../game/tasks/walk';
-import TaskWallBuild from '../game/tasks/wall-build';
-import TaskWallDemolish from '../game/tasks/wall-demolish';
+import TaskManager from '../game/tasks/index';
+import TaskWalk from '../game/tasks/task-walk';
+import TaskWallBuild from '../game/tasks/task-wall-build';
+import TaskWallDemolish from '../game/tasks/task-wall-demolish';
+import game from './init-game';
 
 const TOOLS: Tool[] = [{
   id: 'build',
@@ -16,7 +18,7 @@ const TOOLS: Tool[] = [{
   class: TaskWallDemolish,
 }, {
   id: 'walk',
-  label: 'Caminar',
+  label: 'Walk',
   class: TaskWalk,
 }];
 
@@ -26,7 +28,10 @@ export default class App extends React.Component<AppProps, AppState> {
     super(props);
 
     (window as any).tool = TOOLS[0];
-    this.state = { tool: TOOLS[0] };
+    this.state = {
+      tool: TOOLS[0],
+      tasks: game.tasks,
+    };
   }
 
   render() {
@@ -43,11 +48,15 @@ export default class App extends React.Component<AppProps, AppState> {
       );
     });
 
+    // const tasks = [];
+
+    // for (const task of this.state.tasks) {
+    //   tasks.push(<li>{task.constructor.name}: {task.needsWorkers()}</li>);
+    // }
+
     return (
       <div className="app">
-        <nav>
-          {tools}
-        </nav>
+        <nav>{tools}</nav>
       </div>
     );
   }
@@ -63,7 +72,8 @@ export default class App extends React.Component<AppProps, AppState> {
 interface AppProps { }
 
 interface AppState {
-  tool?: Tool;
+  tool: Tool;
+  tasks: TaskManager;
 }
 
 interface Tool {

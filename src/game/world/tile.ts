@@ -6,20 +6,35 @@ import property from '../../meta/property';
 import Game from '../game';
 import { IArea } from '../pathfinding/i-area';
 import { INode, INodeRelation } from '../pathfinding/i-node';
-import Sprite from '../sprite';
 import Entity from './entity';
 
-export default class Tile extends Sprite implements INode {
+export default class Tile implements INode {
 
+    readonly entities = new Set<Entity>();
+    readonly view: Rectangle;
+    readonly center: Vector;
     onChange: () => void;
-    entities = new Set<Entity>();
-    view: Rectangle;
     debugColor: Color | null = null;
     debugContent: string | null = null;
     isHover = false;
+    isBlueprint = false;
 
     @property
     isEnabled = false;
+
+    get x() {
+        return this.pos.x;
+    }
+    set x(value: number) {
+        this.pos = Vector.of(value, this.pos.y);
+    }
+
+    get y() {
+        return this.pos.y;
+    }
+    set y(value: number) {
+        this.pos = Vector.of(this.pos.x, value);
+    }
 
     constructor(
         private game: Game,
@@ -27,37 +42,39 @@ export default class Tile extends Sprite implements INode {
         size: Vector,
         private diagonalMovementCost: number,
     ) {
-        super(pos);
-
         this.view = new Rectangle(pos.multiply(size), size);
+        this.center = this.view.pos.add(size.divideValue(2));
     }
 
-    _render(context: Renderer2D): void {
-        context.translate(this.view.x, this.view.y);
-        this.drawTile(context);
-        this.drawEntities(context);
-    }
-
-    private drawTile(context: Renderer2D) {
+    renderTile(context: Renderer2D) {
+        const { x, y, width, height } = this.view;
         let color = Color.BLACK;
 
-        if (this.isHover) {
+        if (this.isHover || this.isBlueprint) {
             color = this.isEnabled ? Color.RED : Color.BLUE;
         } else {
             color = this.isEnabled ? Color.WHITE : Color.BLACK;
         }
 
-        context.strokeStyle = (this.debugColor || Color.GRAY).toString();
+        context.strokeStyle = Color.GRAY.toString();
         context.fillStyle = color.toString();
 
         context.beginPath();
-        context.rect(0, 0, this.view.width, this.view.height);
+        context.rect(x, y, width, height);
         context.fill();
         context.stroke();
         context.closePath();
+
+        if (this.debugColor) {
+            context.strokeStyle = this.debugColor.toString();
+            context.beginPath();
+            context.rect(x + 1, y + 1, width - 2, height - 2);
+            context.stroke();
+            context.closePath();
+        }
     }
 
-    private drawEntities(context: Renderer2D) {
+    renderEntities(context: Renderer2D) {
         this.entities.forEach(entity => entity.render(context, this.game));
     }
 

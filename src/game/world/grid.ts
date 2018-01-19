@@ -8,11 +8,12 @@ import Tile from './tile';
 
 export default class Grid extends Area {
 
+    readonly size: Vector;
+    readonly changedTiles: Set<Tile>;
     private all: Tile[];
     private allEntities: Set<Entity>;
     private area: Rectangle;
     private tileSize: Vector;
-    public size: Vector;
 
     constructor(
         game: Game,
@@ -29,17 +30,18 @@ export default class Grid extends Area {
             }
 
             const tile = new Tile(game, coords, tileSize, diagonalMovementCost);
-            tile.onChange = () => game.pathfinding.recalculate(tile);
+            tile.onChange = () => this.changedTiles.add(tile);
             row[coords.x] = tile;
         }
 
         super(tiles);
 
+        this.size = size;
+        this.changedTiles = new Set<Tile>();
         this.all = ([] as Tile[]).concat(...tiles);
         this.allEntities = new Set();
         this.area = new Rectangle(Vector.ZERO, size);
         this.tileSize = tileSize;
-        this.size = size;
     }
 
     addEntity(entity: Entity) {

@@ -44,9 +44,13 @@ export default class Renderer {
             // this.drawTargetCell();
         }
 
+        const tiles = this.game.getVisibleTiles();
+
+        tiles.forEach(tile => tile.renderTile(this.background));
+        tiles.forEach(tile => tile.renderEntities(this.context));
+
         // this.drawOccupiedCells();
         // this.drawPathingCells();
-        this.drawTiles();
         // this.drawCombatInfo();
         // this.drawHighTiles(this.context);
         this.context.restore();
@@ -58,12 +62,6 @@ export default class Renderer {
 
     setCameraView(context: Renderer2D) {
         context.translate(-this.camera.x * this.scale, -this.camera.y * this.scale);
-    }
-
-    drawTiles() {
-        for (const tile of this.game.getVisibleTiles()) {
-            tile.render(this.background, this.game);
-        }
     }
 
     fillScreen() {
