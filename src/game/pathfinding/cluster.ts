@@ -1,4 +1,4 @@
-import { DEBUG_PATHFINDING_CLUSTERS, DEV_MODE } from '../../constants';
+import { DEBUG_PATHFINDING_CLUSTERS_NODES, DEBUG_PATHFINDING_CLUSTERS_ROUTES, DEV_MODE } from '../../constants';
 import Color from '../../geometry/color';
 import { Side } from '../../geometry/side';
 import Vector from '../../geometry/vector';
@@ -99,7 +99,7 @@ export class Cluster {
         notNull(paths.get(start)).set(end, path);
         notNull(paths.get(end)).set(start, [...path].reverse());
 
-        if (DEBUG_PATHFINDING_CLUSTERS) {
+        if (DEBUG_PATHFINDING_CLUSTERS_ROUTES) {
             const color = COLORS[index++ % COLORS.length];
 
             for (const step of path) {
@@ -138,7 +138,7 @@ export class Cluster {
             }
 
             if (neighborsCount === 0 || neighborsCount === 1) {
-                if (DEBUG_PATHFINDING_CLUSTERS) {
+                if (DEBUG_PATHFINDING_CLUSTERS_NODES) {
                     tile.debugColor = Color.BLUE;
                 }
 

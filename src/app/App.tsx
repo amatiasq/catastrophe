@@ -2,6 +2,7 @@ import './App.css';
 
 import { bind } from 'bind-decorator';
 import * as React from 'react';
+import TaskWalk from '../game/tasks/walk';
 import TaskWallBuild from '../game/tasks/wall-build';
 import TaskWallDemolish from '../game/tasks/wall-demolish';
 
@@ -13,6 +14,10 @@ const TOOLS: Tool[] = [{
   id: 'demolish',
   label: 'Demolish wall',
   class: TaskWallDemolish,
+}, {
+  id: 'walk',
+  label: 'Caminar',
+  class: TaskWalk,
 }];
 
 export default class App extends React.Component<AppProps, AppState> {

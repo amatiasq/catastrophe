@@ -1,4 +1,5 @@
-import { DEBUG_PATHFINDING_CLUSTERS } from '../../constants';
+import { bind } from 'bind-decorator';
+import { DEBUG_PATHFINDING_CLUSTERS_NODES } from '../../constants';
 import Vector from '../../geometry/vector';
 import notNull from '../../meta/not-null';
 import { Cluster } from './cluster';
@@ -70,10 +71,11 @@ export class Pathfinding {
         const startCluster = this.getClusterFor(start);
 
         if (startCluster === this.getClusterFor(end)) {
-            return {
-                levels: [],
-                tiles: notNull(startCluster.resolve(start, end)),
-            };
+            const path = startCluster.resolve(start, end);
+
+            if (path) {
+                return { levels: [], tiles: path };
+            }
         }
 
         const startNode = this.getTempNodeFor(start);
@@ -143,25 +145,9 @@ export class Pathfinding {
     }
 
     processConnections() {
-        this.forEach(cluster => {
-            for (const entrance of cluster.processEntrances()) {
-                const node = this.getNodeFor(entrance);
+        this.forEach(this.processCluster);
 
-                for (const [connection, path] of cluster.getConnections(entrance)) {
-                    const connectionNode = this.getNodeFor(connection);
-                    const relation = {
-                        cost: this.algorithm.getCost(entrance, path),
-                        childA: entrance,
-                        childB: connection,
-                    };
-
-                    node.setNeighbor(connectionNode, relation);
-                    connectionNode.setNeighbor(node, relation);
-                }
-            }
-        });
-
-        if (DEBUG_PATHFINDING_CLUSTERS) {
+        if (DEBUG_PATHFINDING_CLUSTERS_NODES) {
             this.nodes.map(node => {
                 let message = '';
 
@@ -172,6 +158,30 @@ export class Pathfinding {
                 console.log(message);
             });
         }
+    }
+
+    recalculate(tile: ITile) {
+        this.processCluster(this.getClusterFor(tile));
+    }
+
+    @bind
+    private processCluster(cluster: Cluster) {
+        for (const entrance of cluster.processEntrances()) {
+            const node = this.getNodeFor(entrance);
+
+            for (const [connection, path] of cluster.getConnections(entrance)) {
+                const connectionNode = this.getNodeFor(connection);
+                const relation = {
+                    cost: this.algorithm.getCost(entrance, path),
+                    childA: entrance,
+                    childB: connection,
+                };
+
+                node.setNeighbor(connectionNode, relation);
+                connectionNode.setNeighbor(node, relation);
+            }
+        }
+
     }
 
     private findNode(child: INode) {

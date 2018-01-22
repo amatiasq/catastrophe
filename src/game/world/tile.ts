@@ -16,12 +16,10 @@ export default class Tile extends Sprite implements INode {
     view: Rectangle;
     debugColor: Color | null = null;
     debugContent: string | null = null;
+    isHover = false;
 
     @property
     isEnabled = false;
-
-    @property
-    isHover = false;
 
     constructor(
         private game: Game,

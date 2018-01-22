@@ -6,7 +6,8 @@ export default class Color {
     static RED = new Color(0xFF0000FF);
     static GREEN = new Color(0x00FF00FF);
     static BLUE = new Color(0x0000FFFF);
-    static BROWN = new Color(0xA52A2A);
+    static BROWN = new Color(0xA52A2AFF);
+    static LIGHT_GREEN = new Color(0x98fb98FF);
 
     constructor(public rgba: number) {}
 
