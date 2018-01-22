@@ -16,14 +16,14 @@
         "eofline": false,
         "forin": true,
         "indent": [ true, "spaces" ],
-        "interface-name": [true, "never-prefix"],
+        "interface-name": [false, "never-prefix"],
         "jsdoc-format": true,
         "jsx-no-lambda": false,
         "jsx-no-multiline-js": false,
         "label-position": true,
         "max-line-length": [ true, 120 ],
         "member-ordering": [
-            true,
+            false,
             "public-before-private",
             "static-before-instance",
             "variables-before-functions"

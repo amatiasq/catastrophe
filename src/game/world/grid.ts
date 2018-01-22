@@ -1,44 +1,59 @@
 import Rectangle from '../../geometry/rectangle';
 import Vector from '../../geometry/vector';
+import notNull from '../../meta/not-null';
 import Game from '../game';
+import Area from './area';
 import Entity from './entity';
 import Tile from './tile';
 
-export default class Grid {
+export default class Grid extends Area {
 
-    private all: Tile[] = [];
-    private tiles: Tiles = [];
-    private allEntities: Entity[] = [];
-    private area = new Rectangle(Vector.ZERO, this.size);
+    private all: Tile[];
+    private allEntities: Set<Entity>;
+    private area: Rectangle;
+    private tileSize: Vector;
+    public size: Vector;
 
     constructor(
-        private game: Game,
-        public size: Vector,
-        public tileSize: Vector
+        game: Game,
+        size: Vector,
+        tileSize: Vector,
+        diagonalMovementCost: number,
     ) {
-        let row: Tile[] = null;
+        const tiles: Tiles = [];
+        let row: Tile[] = [];
 
-        for (const coords of this.size) {
+        for (const coords of size) {
             if (coords.x === 0) {
-                if (row) {
-                    this.all.push(...row);
-                }
-
-                row = this.tiles[coords.y] = [];
+                row = tiles[coords.y] = [];
             }
 
-            row[coords.x] = new Tile(this.game, coords, tileSize);
+            row[coords.x] = new Tile(game, coords, tileSize, diagonalMovementCost);
         }
+
+        super(tiles);
+
+        this.all = ([] as Tile[]).concat(...tiles);
+        this.allEntities = new Set();
+        this.area = new Rectangle(Vector.ZERO, size);
+        this.tileSize = tileSize;
+        this.size = size;
     }
 
     addEntity(entity: Entity) {
-        const tile = this.getTileAt(entity.pos);
+        const tile = notNull(this.getAt(entity.pos));
         tile.entities.add(entity);
-        this.allEntities.push(entity);
+        this.allEntities.add(entity);
+    }
+
+    removeEntity(entity: Entity) {
+        const tile = notNull(this.getAt(entity.pos));
+        tile.entities.delete(entity);
+        this.allEntities.delete(entity);
     }
 
     moveEntity(entity: Entity, target: Vector) {
-        const oldTile = this.getTileAt(entity.pos);
+        const oldTile = this.getAt(entity.pos);
 
         if (oldTile) {
             oldTile.entities.delete(entity);
@@ -56,15 +71,15 @@ export default class Grid {
         return this.all;
     }
 
-    getTileAt(coords: Vector) {
-        return this.tiles[coords.y][coords.x];
-    }
-
     getTilesAt(area: Rectangle) {
         const tiles: Tile[] = [];
 
         for (const coords of area) {
-            tiles.push(this.getTileAt(coords));
+            const tile = this.getAt(coords);
+
+            if (tile) {
+                tiles.push(tile);
+            }
         }
 
         return tiles;

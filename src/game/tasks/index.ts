@@ -1,7 +1,8 @@
 import Entity from '../world/entity';
+import Tile from '../world/tile';
 
 export default class TaskManager {
-    protected tasks = [] as Array<Task>;
+    protected tasks: Task[] = [];
     protected idles = new Set<TaskWorker>();
 
     get hasJobs(): boolean {
@@ -14,6 +15,10 @@ export default class TaskManager {
 
     addIdle(worker: TaskWorker): void {
         this.idles.add(worker);
+    }
+
+    removeIdle(worker: TaskWorker) {
+        this.idles.delete(worker);
     }
 
     addTask(task: Task): void {
@@ -82,6 +87,7 @@ export interface Task {
 }
 
 export interface TaskWorker extends Entity {
-    assignTask(task: Task): void;
+    tile: Tile | null;
+    assignTask(task: Task | null): void;
     update(tasks: TaskManager): void;
 }

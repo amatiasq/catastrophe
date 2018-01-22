@@ -1,25 +1,35 @@
 import { bind } from 'bind-decorator';
+import { CLOSER_MODIFIER, CLUSTER_SIZE, DIAGONAL_MOVEMENT_COST, TILE_SIZE } from '../constants';
 import Vector from '../geometry/vector';
+import notNull from '../meta/not-null';
 import Camera from './camera';
+import AStar from './pathfinding/a-star';
+import { Pathfinding } from './pathfinding/pathfinding';
 import Player from './player';
 import Renderer from './renderer';
 import TaskManager from './tasks/index';
 import Ticker from './ticker';
 import Entity from './world/entity';
 import Grid from './world/grid';
+import Tile from './world/tile';
 
 export default class Game {
 
     delta = 0;
     deltaSeconds = 0;
-    tileSize = Vector.of(16, 16);
+    tileSize = Vector.of(TILE_SIZE, TILE_SIZE);
 
     player: Player;
     renderer: Renderer;
     tasks = new TaskManager();
     ticker = new Ticker(this.onTick);
-    grid = new Grid(this, Vector.of(100, 100), this.tileSize);
+    grid = new Grid(this, Vector.of(100, 100), this.tileSize, DIAGONAL_MOVEMENT_COST);
     camera = new Camera(this, Vector.ZERO, Vector.ZERO);
+    pathfinding = new Pathfinding(
+        this.grid,
+        new AStar<Tile>(CLOSER_MODIFIER),
+        CLUSTER_SIZE
+    );
 
     get isRunning()  {
         return this.ticker.isRunning;
@@ -43,8 +53,13 @@ export default class Game {
         this.tasks.addIdle(entity);
     }
 
+    removeEntity(entity: Entity) {
+        this.grid.removeEntity(entity);
+        this.tasks.removeIdle(entity);
+    }
+
     getEntitiesAt(coords: Vector): Entity[] {
-        return [...this.grid.getTileAt(coords).entities];
+        return [...notNull(this.grid.getAt(coords)).entities];
     }
 
     moveEntity(entity: Entity, target: Vector) {
@@ -73,6 +88,7 @@ export default class Game {
         }
 
         this.renderer.renderFrame();
+        this.pathfinding.clearCache();
     }
 
 }

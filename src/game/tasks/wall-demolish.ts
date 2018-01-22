@@ -1,5 +1,6 @@
 import Rectangle from '../../geometry/rectangle';
 import Vector from '../../geometry/vector';
+import notNull from '../../meta/not-null';
 import Game from '../game';
 import { Task, TaskWorker } from './index';
 
@@ -9,10 +10,10 @@ export default class TaskWallDemolish implements Task {
 
     priority = 0;
     private _isCompleted = false;
-    private tileIterator: Iterator<Vector> = null;
-    private workingTile: Vector = null;
+    private tileIterator: Iterator<Vector> | null = null;
+    private workingCoords: Vector | null = null;
+    private worker: TaskWorker | null = null;
     private remaining = SECONDS_PER_WALL;
-    private worker: TaskWorker = null;
 
     get isCompleted() {
         return this._isCompleted;
@@ -44,35 +45,36 @@ export default class TaskWallDemolish implements Task {
             return;
         }
 
-        const tile = this.game.grid.getTileAt(this.workingTile);
+        const tile = notNull(this.game.grid.getAt(notNull(this.workingCoords)));
         tile.isEnabled = false;
 
         this.nextTile();
     }
 
     private nextTile() {
-        const { value, done } = this.tileIterator.next() as {
+        const worker = notNull(this.worker);
+        const { value, done } = (this.tileIterator as Iterator<Vector>).next() as {
             value: Vector,
             done: boolean,
         };
 
         if (done) {
-            this.workingTile = null;
+            this.workingCoords = null;
             this._isCompleted = true;
-            this.worker.assignTask(null);
+            worker.assignTask(null);
             return;
         }
 
-        const tile = this.game.grid.getTileAt(value);
+        const tile = notNull(this.game.grid.getAt(value));
 
         if (!tile.isEnabled) {
             this.nextTile();
             return;
         }
 
-        this.workingTile = value;
+        this.workingCoords = value;
         this.remaining = SECONDS_PER_WALL;
-        this.game.moveEntity(this.worker, value);
+        this.game.moveEntity(worker, value);
     }
 
 }

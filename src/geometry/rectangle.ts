@@ -60,7 +60,19 @@ export default class Rectangle implements Iterable<Vector> {
     contains(point: Vector) {
         const { x: px, y: py } = point;
         const { x, y, endX, endY } = this;
-        return px > x && px < endX && py > y && py < endY;
+        return px >= x && px < endX && py >= y && py < endY;
+    }
+
+    containsVertically(point: Vector) {
+        const { x: px } = point;
+        const { x, endX } = this;
+        return px >= x && px < endX;
+    }
+
+    containsHorizontally(point: Vector) {
+        const { y: py } = point;
+        const { y, endY } = this;
+        return py >= y && py < endY;
     }
 
     clamp(limit: Rectangle) {
