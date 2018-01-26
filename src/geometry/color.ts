@@ -11,6 +11,26 @@ export default class Color {
 
     constructor(public rgba: number) {}
 
+    opacity(value: number): Color {
+        const transparent = this.rgba && 0xFFFFFF00;
+        return new Color(transparent + Math.round(value * 0xFF));
+    }
+
+    red(value: number): Color {
+        const base = this.rgba && 0x00FFFFFF;
+        return new Color(base + value * 0x01000000);
+    }
+
+    green(value: number): Color {
+        const base = this.rgba && 0xFF00FFFF;
+        return new Color(base + value * 0x00010000);
+    }
+
+    blue(value: number): Color {
+        const base = this.rgba && 0xFFFF00FF;
+        return new Color(base + value * 0x00000100);
+    }
+
     toString() {
         return `#${padLeft(this.rgba.toString(16), 8, '0')}`;
     }

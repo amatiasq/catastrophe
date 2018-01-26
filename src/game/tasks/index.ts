@@ -2,8 +2,8 @@ import Entity from '../world/entity';
 import Tile from '../world/tile';
 
 export default class TaskManager {
-    protected tasks: Task[] = [];
-    protected idles = new Set<TaskWorker>();
+    private readonly tasks: Task[] = [];
+    private readonly idles = new Set<Worker>();
 
     get hasJobs(): boolean {
         return Boolean(this.tasks.length);
@@ -13,64 +13,95 @@ export default class TaskManager {
         return Boolean(this.idles.size);
     }
 
-    addIdle(worker: TaskWorker): void {
+    addWorker(worker: Worker): void {
         this.idles.add(worker);
     }
 
-    removeIdle(worker: TaskWorker) {
+    removeWorker(worker: Worker) {
         this.idles.delete(worker);
+    }
+
+    isIdle(worker: Worker) {
+        return this.idles.has(worker);
     }
 
     addTask(task: Task): void {
         // TODO: usar un heap
-        let i;
-
-        for (i = 0; i < this.tasks.length; i++) {
-            if (this.tasks[i].priority < task.priority) {
-                break;
-            }
-        }
-
-        this.tasks.splice(i, 0, task);
+        const index = getInsertionIndex(this.tasks, task, (entry) => entry.priority);
+        this.tasks.splice(index, 0, task);
     }
 
-    assign() {
+    removeTask(task: Task) {
+        const index = this.tasks.indexOf(task);
+        this.tasks.splice(index, 1);
+    }
+
+    assign(task: Task, worker: Worker) {
+        worker.task = task;
+        this.removeWorker(worker);
+    }
+
+    assignAll() {
         if (!this.hasJobs || !this.hasWorkers) {
             return;
         }
 
-        const remove = new Set<Task>();
+        const abandoned: Task[] = [];
 
         for (const task of this.tasks) {
-            let chosen;
-            let bestValidity = 0;
+            const validities: number[] = [];
+            const workers: Worker[] = [];
+
+            if (task.isCompleted) {
+                this.removeTask(task);
+                continue;
+            }
+
+            if (!task.needsWorkers()) {
+                continue;
+            }
 
             for (const worker of this.idles) {
                 const validity = task.isValidWorker(worker);
 
-                if (validity > bestValidity) {
-                    chosen = worker;
-                    bestValidity = validity;
+                if (validity > 0) {
+                    // TODO: We need a { validity, worker } array sorted by validity
+                    // rooom for optimization here
+                    const index = getInsertionIndex(validities, validity, identity);
+                    validities.splice(index, 0, validity);
+                    workers.splice(index, 0, worker);
                 }
             }
 
-            if (chosen) {
-                task.assign(chosen);
-                chosen.assignTask(task);
-                this.idles.delete(chosen);
-                remove.add(task);
+            if (!validities.length) {
+                abandoned.push(task);
+                continue;
+            }
+
+            for (let i = 0; i < validities.length; i++) {
+                const worker = workers[i];
+
+                if (task.needsWorkers()) {
+                    this.assign(task, worker);
+                }
             }
         }
 
-        this.tasks = this.tasks.filter(task => !remove.has(task));
-
-        if (!this.tasks.length) {
-            return;
+        if (abandoned.length) {
+            console.log(`No one can:\n\t${abandoned.join('\n\t')}`);
         }
-
-        const message = this.tasks.map(task => task.toString());
-        console.log(`No one can:\n\t${message.join('\n\t')}`);
     }
+
+    applyChanges(): void {
+        for (const task of this.tasks) {
+            task.apply();
+        }
+    }
+
+    [Symbol.iterator]() {
+        return this.tasks[Symbol.iterator]();
+    }
+
 }
 
 export interface Task {
@@ -80,14 +111,31 @@ export interface Task {
     // Should return a value between 1 and 0.
     // 1 means the best worker for the job
     // 0 means he can't do it
-    isValidWorker(worker: TaskWorker): number;
-
-    assign(worker: TaskWorker): void;
-    step(worker: TaskWorker): void;
+    isValidWorker(worker: Worker): number;
+    needsWorkers(): boolean;
+    getTargetForWorker(worker: Worker): Tile;
+    step(worker: Worker): boolean;
+    apply(): void;
 }
 
-export interface TaskWorker extends Entity {
+export interface Worker extends Entity {
     tile: Tile | null;
     assignTask(task: Task | null): void;
     update(tasks: TaskManager): void;
+}
+
+function getInsertionIndex<T>(array: T[], entry: T, getter: (value: T) => number) {
+    const value = getter(entry);
+
+    for (let i = 0; i < array.length; i++) {
+        if (getter(array[i]) < value) {
+            return i;
+        }
+    }
+
+    return array.length;
+}
+
+function identity<T>(value: T): T {
+    return value;
 }

@@ -66,6 +66,13 @@ export default class Vector implements Vector, Iterable<Vector> {
         return Vector.of(x, y);
     }
 
+    static random(max: Vector) {
+        return Vector.of(
+            Math.round(Math.random() * max.x),
+            Math.round(Math.random() * max.y),
+        );
+    }
+
     static range(...vectors: Vector[]) {
         return {
             min: this.map(Math.min, ...vectors),

@@ -1,11 +1,13 @@
 import Rectangle from '../../geometry/rectangle';
 import { Side } from '../../geometry/side';
 import Vector from '../../geometry/vector';
+import { lowest } from '../../meta/best-of';
 import notNull from '../../meta/not-null';
 import { IArea } from '../pathfinding/i-area';
 import { INode } from '../pathfinding/i-node';
 import { Tiles } from './grid';
 import Tile from './tile';
+import WorkArea from './work-area';
 
 export default class Area extends Rectangle implements IArea<Tile> {
 
@@ -98,18 +100,7 @@ export default class Area extends Rectangle implements IArea<Tile> {
         }
 
         const corners = this.getCorners();
-        let bestDistance = Infinity;
-
-        return notNull(corners.reduce((best, current) => {
-            const distance = current.pos.simpleDistance(point);
-
-            if (distance > bestDistance) {
-                return best;
-            }
-
-            bestDistance = distance;
-            return current;
-        }, null));
+        return notNull(lowest(corners, corner => corner.pos.simpleDistance(point)));
     }
 
     getRangeFromRectangle(range: Rectangle): Area {
@@ -144,15 +135,31 @@ export default class Area extends Rectangle implements IArea<Tile> {
         ].filter(Boolean) as Tile[];
     }
 
-    getNeighbors(tile: INode): Tile[] {
+    getDiagonals(tile: INode): Tile[] {
         const { x, y } = tile.pos.sustract(this.pos);
 
         return [
-            ...this.getAdjacent(tile),
             this.get(x - 1, y - 1),
             this.get(x - 1, y + 1),
             this.get(x + 1, y - 1),
             this.get(x + 1, y + 1),
         ].filter(Boolean) as Tile[];
+    }
+
+    getNeighbors(tile: INode): Tile[] {
+        return [
+            ...this.getAdjacent(tile),
+            ...this.getDiagonals(tile),
+        ];
+    }
+
+    toWorkArea(filter?: (tile: Tile) => boolean): WorkArea {
+        let list = ([] as Tile[]).concat(...this.grid);
+
+        if (filter) {
+            list = list.filter(filter);
+        }
+
+        return new WorkArea(list);
     }
 }
