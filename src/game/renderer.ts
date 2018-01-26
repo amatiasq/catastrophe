@@ -36,23 +36,11 @@ export default class Renderer {
         }
 
         this.context.save();
-        // this.setCameraView(this.context);
-        // this.drawAnimatedTiles();
-
-        if (this.game.isRunning) {
-            // this.drawSelectedCell();
-            // this.drawTargetCell();
-        }
 
         const tiles = this.game.getVisibleTiles();
-
         tiles.forEach(tile => tile.renderTile(this.background));
         tiles.forEach(tile => tile.renderEntities(this.context));
 
-        // this.drawOccupiedCells();
-        // this.drawPathingCells();
-        // this.drawCombatInfo();
-        // this.drawHighTiles(this.context);
         this.context.restore();
     }
 
