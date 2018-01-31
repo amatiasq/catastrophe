@@ -19,7 +19,7 @@ export default abstract class AreaWork implements Task {
     }
 
     constructor(
-        private readonly game: Game,
+        protected readonly game: Game,
         protected readonly area: WorkArea
     ) {
         for (const tile of this.area) {

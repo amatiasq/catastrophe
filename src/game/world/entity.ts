@@ -13,7 +13,7 @@ export default class Entity extends Sprite implements Worker {
     private walking: Walk | null = null;
 
     get isIdle(): boolean {
-        return this.game.tasks.isIdle(this);
+        return this.game.isIdle(this);
     }
 
     get tile() {
@@ -44,7 +44,7 @@ export default class Entity extends Sprite implements Worker {
 
         if (!value) {
             this.walking = null;
-            this.game.tasks.addWorker(this);
+            this.game.addIdleWorker(this);
             return;
         }
 

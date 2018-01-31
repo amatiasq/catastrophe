@@ -1,4 +1,3 @@
-import { DEFAULT_TRAVEL_COST } from '../../constants';
 import Color from '../../geometry/color';
 import Rectangle from '../../geometry/rectangle';
 import Vector from '../../geometry/vector';
@@ -82,7 +81,7 @@ export default class Tile implements INode {
      * PATHFINDING *
      ***************/
 
-    travelCost = DEFAULT_TRAVEL_COST;
+    travelCost = this.game.getParam('DEFAULT_TRAVEL_COST');
 
     get isObstacle() {
         return this.isEnabled === true;
