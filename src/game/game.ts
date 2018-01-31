@@ -1,5 +1,4 @@
 import { bind } from 'bind-decorator';
-import { CLOSER_MODIFIER, CLUSTER_SIZE, DIAGONAL_MOVEMENT_COST, MAP_SIZE, TILE_SIZE } from '../constants';
 import Vector from '../geometry/vector';
 import notNull from '../meta/not-null';
 import Camera from './camera';
@@ -7,7 +6,7 @@ import AStar from './pathfinding/a-star';
 import { Pathfinding } from './pathfinding/pathfinding';
 import Player from './player';
 import Renderer from './renderer';
-import TaskManager from './tasks/index';
+import TaskManager, { WorkerEntity } from './tasks/index';
 import Ticker from './ticker';
 import Entity from './world/entity';
 import Grid from './world/grid';
@@ -17,31 +16,45 @@ export default class Game {
 
     delta = 0;
     deltaSeconds = 0;
-    tileSize = Vector.of(TILE_SIZE, TILE_SIZE);
+    readonly player: Player;
+    private readonly tileSize = Vector.of(this.getParam('TILE_SIZE'), this.getParam('TILE_SIZE'));
 
-    player: Player;
-    renderer: Renderer;
-    tasks = new TaskManager();
-    ticker = new Ticker(this.onTick);
-    grid = new Grid(this, Vector.of(MAP_SIZE, MAP_SIZE), this.tileSize, DIAGONAL_MOVEMENT_COST);
-    camera = new Camera(this, Vector.ZERO, Vector.ZERO);
-    pathfinding = new Pathfinding(
-        this.grid,
-        new AStar<Tile>(CLOSER_MODIFIER),
-        CLUSTER_SIZE
+    readonly tasks = new TaskManager();
+    readonly camera = new Camera(this, Vector.ZERO, Vector.ZERO);
+    readonly grid = new Grid(
+        this,
+        Vector.of(this.getParam('MAP_SIZE'), this.getParam('MAP_SIZE')),
+        this.tileSize,
+        this.getParam('DIAGONAL_MOVEMENT_COST'),
     );
+    readonly pathfinding = new Pathfinding(
+        this.grid,
+        new AStar<Tile>(this.getParam('CLOSER_MODIFIER')),
+        this.getParam('CLUSTER_SIZE'),
+    );
+
+    private readonly renderer: Renderer;
+    private readonly ticker = new Ticker(this.onTick);
 
     get isRunning()  {
         return this.ticker.isRunning;
     }
 
     constructor(
+        private environment: EnvironmentVariableProvider,
         canvas: Canvas,
         background: Canvas,
         foreground: Canvas,
     ) {
         this.renderer = new Renderer(this, canvas, background, foreground);
         this.player = new Player(this, foreground);
+    }
+
+    getParam(key: string, type: 'string'): string;
+    getParam(key: string, type?: 'number'): number;
+    getParam(key: string, type: 'boolean'): boolean;
+    getParam(key: string, type?: 'string' | 'number' | 'boolean') {
+        return this.environment(key, type);
     }
 
     start() {
@@ -64,6 +77,14 @@ export default class Game {
 
     moveEntity(entity: Entity, target: Vector) {
         this.grid.moveEntity(entity, target);
+    }
+
+    isIdle(worker: WorkerEntity) {
+        return this.tasks.isIdle(worker);
+    }
+
+    addIdleWorker(worker: WorkerEntity): any {
+        return this.tasks.addWorker(worker);
     }
 
     getVisibleTiles() {
@@ -94,3 +115,5 @@ export default class Game {
     }
 
 }
+
+type EnvironmentVariableProvider = (key: string, type?: 'string' | 'number' | 'boolean') => string | number | boolean;

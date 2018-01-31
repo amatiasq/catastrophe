@@ -3,7 +3,7 @@ import Tile from '../world/tile';
 
 export default class TaskManager {
     private readonly tasks: Task[] = [];
-    private readonly idles = new Set<Worker>();
+    private readonly idles = new Set<WorkerEntity>();
 
     get hasJobs(): boolean {
         return Boolean(this.tasks.length);
@@ -13,15 +13,15 @@ export default class TaskManager {
         return Boolean(this.idles.size);
     }
 
-    addWorker(worker: Worker): void {
+    addWorker(worker: WorkerEntity): void {
         this.idles.add(worker);
     }
 
-    removeWorker(worker: Worker) {
+    removeWorker(worker: WorkerEntity) {
         this.idles.delete(worker);
     }
 
-    isIdle(worker: Worker) {
+    isIdle(worker: WorkerEntity) {
         return this.idles.has(worker);
     }
 
@@ -36,7 +36,7 @@ export default class TaskManager {
         this.tasks.splice(index, 1);
     }
 
-    assign(task: Task, worker: Worker) {
+    assign(task: Task, worker: WorkerEntity) {
         worker.task = task;
         this.removeWorker(worker);
     }
@@ -50,7 +50,7 @@ export default class TaskManager {
 
         for (const task of this.tasks) {
             const validities: number[] = [];
-            const workers: Worker[] = [];
+            const workers: WorkerEntity[] = [];
 
             if (task.isCompleted) {
                 this.removeTask(task);
@@ -111,14 +111,14 @@ export interface Task {
     // Should return a value between 1 and 0.
     // 1 means the best worker for the job
     // 0 means he can't do it
-    isValidWorker(worker: Worker): number;
+    isValidWorker(worker: WorkerEntity): number;
     needsWorkers(): boolean;
-    getTargetForWorker(worker: Worker): Tile;
-    step(worker: Worker): boolean;
+    getTargetForWorker(worker: WorkerEntity): Tile;
+    step(worker: WorkerEntity): boolean;
     apply(): void;
 }
 
-export interface Worker extends Entity {
+export interface WorkerEntity extends Entity {
     tile: Tile | null;
     assignTask(task: Task | null): void;
     update(tasks: TaskManager): void;
