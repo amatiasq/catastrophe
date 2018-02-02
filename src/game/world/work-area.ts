@@ -1,12 +1,12 @@
+import TileLogic from '../../components/tile/tile-logic';
 import { lowest } from '../../meta/best-of';
 import notNull from '../../meta/not-null';
-import Tile from './tile';
 
 export default class WorkArea {
 
-    private readonly todo: Set<Tile>;
-    private readonly reserved = new Set<Tile>();
-    private readonly done = new Set<Tile>();
+    private readonly todo: Set<TileLogic>;
+    private readonly reserved = new Set<TileLogic>();
+    private readonly done = new Set<TileLogic>();
 
     get isCompleted() {
         return this.todo.size === 0 && this.reserved.size === 0;
@@ -20,44 +20,44 @@ export default class WorkArea {
         return this.todo.size + this.reserved.size + this.done.size;
     }
 
-    constructor(iterable: Iterable<Tile>) {
-        this.todo = new Set<Tile>(iterable);
+    constructor(iterable: Iterable<TileLogic>) {
+        this.todo = new Set<TileLogic>(iterable);
     }
 
-    getTargetFrom(tile: Tile): Tile {
+    getTargetFrom(tile: TileLogic): TileLogic {
         return notNull(lowest(this.todo, entry => entry.estimateDistanceTo(tile)));
     }
 
-    getNeighbors(tile: Tile) {
+    getNeighbors(tile: TileLogic) {
         return [ ...this.todo ].filter(entry => entry.isNeighbor(tile));
     }
 
-    has(tile: Tile) {
+    has(tile: TileLogic) {
         return this.todo.has(tile) || this.reserved.has(tile) || this.done.has(tile);
     }
 
-    isTodo(tile: Tile) {
+    isTodo(tile: TileLogic) {
         return this.todo.has(tile);
     }
 
-    isPending(tile: Tile) {
+    isPending(tile: TileLogic) {
         return this.reserved.has(tile) || this.todo.has(tile);
     }
 
-    isReserved(tile: Tile) {
+    isReserved(tile: TileLogic) {
         return this.reserved.has(tile);
     }
 
-    isDone(tile: Tile) {
+    isDone(tile: TileLogic) {
         return this.done.has(tile);
     }
 
-    reserveTile(tile: Tile) {
+    reserveTileLogic(tile: TileLogic) {
         this.todo.delete(tile);
         this.reserved.add(tile);
     }
 
-    completeTile(tile: Tile) {
+    completeTileLogic(tile: TileLogic) {
         this.reserved.delete(tile);
         this.done.add(tile);
     }

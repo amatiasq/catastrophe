@@ -1,4 +1,5 @@
 import { bind } from 'bind-decorator';
+import Ticker from '../core/ticker';
 import Vector from '../geometry/vector';
 import notNull from '../meta/not-null';
 import Camera from './camera';
@@ -6,8 +7,7 @@ import AStar from './pathfinding/a-star';
 import { Pathfinding } from './pathfinding/pathfinding';
 import Player from './player';
 import Renderer from './renderer';
-import TaskManager, { Worker } from './tasks/index';
-import Ticker from './ticker';
+import TaskManager, { WorkerEntity } from './tasks/index';
 import Entity from './world/entity';
 import Grid from './world/grid';
 import Tile from './world/tile';
@@ -34,7 +34,7 @@ export default class Game {
     );
 
     private readonly renderer: Renderer;
-    private readonly ticker = new Ticker(this.onTick);
+    private readonly ticker = new Ticker(60, this.onTick);
 
     get isRunning()  {
         return this.ticker.isRunning;
@@ -79,11 +79,11 @@ export default class Game {
         this.grid.moveEntity(entity, target);
     }
 
-    isIdle(worker: Worker) {
+    isIdle(worker: WorkerEntity) {
         return this.tasks.isIdle(worker);
     }
 
-    addIdleWorker(worker: Worker): any {
+    addIdleWorker(worker: WorkerEntity): any {
         return this.tasks.addWorker(worker);
     }
 

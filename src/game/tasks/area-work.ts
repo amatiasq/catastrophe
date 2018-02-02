@@ -3,7 +3,7 @@ import notNull from '../../meta/not-null';
 import Game from '../game';
 import Tile from '../world/tile';
 import WorkArea from '../world/work-area';
-import { Task, Worker } from './index';
+import { Task, WorkerEntity } from './index';
 
 const MAX_DISTANCE = 1000;
 
@@ -12,7 +12,7 @@ export default abstract class AreaWork implements Task {
     readonly priority = 0;
     protected TICKS_PER_TILE = 60;
     private readonly remaining = new WeakMap<Tile, number>();
-    private readonly complete = new Set<{ tile: Tile, worker: Worker }>();
+    private readonly complete = new Set<{ tile: Tile, worker: WorkerEntity }>();
 
     get isCompleted() {
         return this.area.isCompleted;
@@ -27,7 +27,7 @@ export default abstract class AreaWork implements Task {
         }
     }
 
-    isValidWorker(worker: Worker): number {
+    isValidWorker(worker: WorkerEntity): number {
         const closestTile = this.area.getTargetFrom(notNull(worker.tile));
         return MAX_DISTANCE - closestTile.estimateDistanceTo(worker.pos);
     }
@@ -36,13 +36,13 @@ export default abstract class AreaWork implements Task {
         return this.area.needsWorkers;
     }
 
-    getTargetForWorker(worker: Worker): Tile {
+    getTargetForWorker(worker: WorkerEntity): Tile {
         const tile = this.area.getTargetFrom(notNull(worker.tile));
         this.area.reserveTile(tile);
         return tile;
     }
 
-    step(worker: Worker): boolean {
+    step(worker: WorkerEntity): boolean {
         if (this.isCompleted) {
             return true;
         }
@@ -124,6 +124,6 @@ export default abstract class AreaWork implements Task {
         });
     }
 
-    protected abstract onTileCompleted(tile: Tile, worker: Worker): void;
+    protected abstract onTileCompleted(tile: Tile, worker: WorkerEntity): void;
 
 }

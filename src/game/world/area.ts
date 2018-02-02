@@ -1,3 +1,5 @@
+import TileLogic from '../../components/tile/tile-logic';
+import { Coords } from '../../core/types';
 import Rectangle from '../../geometry/rectangle';
 import { Side } from '../../geometry/side';
 import Vector from '../../geometry/vector';
@@ -5,11 +7,9 @@ import { lowest } from '../../meta/best-of';
 import notNull from '../../meta/not-null';
 import { IArea } from '../pathfinding/i-area';
 import { INode } from '../pathfinding/i-node';
-import { Tiles } from './grid';
-import Tile from './tile';
 import WorkArea from './work-area';
 
-export default class Area extends Rectangle implements IArea<Tile> {
+export default class Area extends Rectangle implements IArea<TileLogic> {
 
     constructor(
         private readonly grid: Tiles
@@ -25,12 +25,12 @@ export default class Area extends Rectangle implements IArea<Tile> {
         return entry ? entry[x] : null;
     }
 
-    getAt(point: Vector) {
-        const entry = this.grid[point.y];
-        return entry ? entry[point.x] : null;
+    getAt({ x, y }: Coords) {
+        const entry = this.grid[y];
+        return entry ? entry[x] : null;
     }
 
-    getRow(y: number): Tile[] | null {
+    getRow(y: number): TileLogic[] | null {
         if (y < 0) {
             y = this.size.y + y;
         }
@@ -38,7 +38,7 @@ export default class Area extends Rectangle implements IArea<Tile> {
         return this.grid[y] || null;
     }
 
-    getCol(x: number): Tile[] | null {
+    getCol(x: number): TileLogic[] | null {
         if (x < 0) {
             x = this.size.x + x;
         }
@@ -50,7 +50,7 @@ export default class Area extends Rectangle implements IArea<Tile> {
         return this.grid.map(row => row[x]);
     }
 
-    getRange(point: Vector, size: Vector): Area {
+    getRange(point: Coords, size: Coords): Area {
         const result: Tiles = [];
 
         for (let j = 0; j < size.y; j++) {
@@ -75,7 +75,7 @@ export default class Area extends Rectangle implements IArea<Tile> {
         return new Area(result);
     }
 
-    getCorners(): Tile[] {
+    getCorners(): TileLogic[] {
         return [
             notNull(this.getAt(Vector.ZERO)),
             notNull(this.get(this.width - 1, 0)),
@@ -84,7 +84,7 @@ export default class Area extends Rectangle implements IArea<Tile> {
         ];
     }
 
-    getClosestTo(point: Vector): Tile {
+    getClosestTo(point: Vector): TileLogic {
         const relative = point.sustract(this.pos);
 
         if (this.contains(point)) {
@@ -107,7 +107,7 @@ export default class Area extends Rectangle implements IArea<Tile> {
         return this.getRange(range.pos, range.size);
     }
 
-    getNeighbor(tile: INode, direction: Side): Tile | null {
+    getNeighbor(tile: INode, direction: Side): TileLogic | null {
         const index = Vector.diff(tile.pos, this.pos);
 
         switch (direction) {
@@ -124,7 +124,7 @@ export default class Area extends Rectangle implements IArea<Tile> {
         }
     }
 
-    getAdjacent(tile: INode): Tile[] {
+    getAdjacent(tile: INode): TileLogic[] {
         const { x, y } = tile.pos.sustract(this.pos);
 
         return [
@@ -132,10 +132,10 @@ export default class Area extends Rectangle implements IArea<Tile> {
             this.get(x - 1, y),
             this.get(x + 1, y),
             this.get(x, y + 1),
-        ].filter(Boolean) as Tile[];
+        ].filter(Boolean) as TileLogic[];
     }
 
-    getDiagonals(tile: INode): Tile[] {
+    getDiagonals(tile: INode): TileLogic[] {
         const { x, y } = tile.pos.sustract(this.pos);
 
         return [
@@ -143,18 +143,18 @@ export default class Area extends Rectangle implements IArea<Tile> {
             this.get(x - 1, y + 1),
             this.get(x + 1, y - 1),
             this.get(x + 1, y + 1),
-        ].filter(Boolean) as Tile[];
+        ].filter(Boolean) as TileLogic[];
     }
 
-    getNeighbors(tile: INode): Tile[] {
+    getNeighbors(tile: INode): TileLogic[] {
         return [
             ...this.getAdjacent(tile),
             ...this.getDiagonals(tile),
         ];
     }
 
-    toWorkArea(filter?: (tile: Tile) => boolean): WorkArea {
-        let list = ([] as Tile[]).concat(...this.grid);
+    toWorkArea(filter?: (tile: TileLogic) => boolean): WorkArea {
+        let list = ([] as TileLogic[]).concat(...this.grid);
 
         if (filter) {
             list = list.filter(filter);
@@ -163,3 +163,5 @@ export default class Area extends Rectangle implements IArea<Tile> {
         return new WorkArea(list);
     }
 }
+
+export type Tiles = TileLogic[][];

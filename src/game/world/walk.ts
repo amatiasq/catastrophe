@@ -1,14 +1,12 @@
-import { DEBUG_PATHFINDING_ROUTES } from '../../constants';
-import Color from '../../geometry/color';
+import EntityLogic from '../../components/entity/entity-logic';
+import TileLogic from '../../components/tile/tile-logic';
 import notNull from '../../meta/not-null';
 import Game from '../game';
-import Entity from '../world/entity';
-import Tile from '../world/tile';
 
 export default class Walk {
 
     private readonly pathfinding = this.game.pathfinding;
-    private route: Tile[] | null;
+    private route: TileLogic[] | null;
     private currentTile = 0;
     private remainingCost = 0;
 
@@ -23,15 +21,15 @@ export default class Walk {
 
     constructor(
         private readonly game: Game,
-        private readonly entity: Entity,
-        private readonly target: Tile,
+        private readonly entity: EntityLogic,
+        private readonly target: TileLogic,
     ) {
         this.calculate();
     }
 
     private calculate() {
         const { entity, target, pathfinding } = this;
-        const start = notNull(entity.tile);
+        const start = entity.tile;
         const {tiles} = notNull(pathfinding.resolve(start, target));
 
         if (!tiles) {
@@ -40,28 +38,9 @@ export default class Walk {
             return;
         }
 
-        this.route = tiles as Tile[];
+        this.route = tiles as TileLogic[];
         this.currentTile = 0;
         this.remainingCost = tiles[0].travelCost;
-    }
-
-    render(context: Renderer2D) {
-        const { route } = this;
-
-        if (!DEBUG_PATHFINDING_ROUTES || this.isCompleted || !route) {
-            return;
-        }
-
-        const [{ center }, ...remaining ] = route.slice(this.currentTile - 1);
-
-        context.save();
-        context.strokeStyle = Color.WHITE.opacity(0.8).toString();
-        context.beginPath();
-        context.moveTo(center.x, center.y);
-        remaining.forEach(({ center: { x, y }}) => context.lineTo(x, y));
-        context.stroke();
-        context.closePath();
-        context.restore();
     }
 
     step(): boolean {

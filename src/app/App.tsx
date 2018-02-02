@@ -2,11 +2,12 @@ import './App.css';
 
 import { bind } from 'bind-decorator';
 import * as React from 'react';
-import TaskManager from '../game/tasks/index';
+// import TaskManager from '../game/tasks/index';
 import TaskWalk from '../game/tasks/task-walk';
 import TaskWallBuild from '../game/tasks/task-wall-build';
 import TaskWallDemolish from '../game/tasks/task-wall-demolish';
-import game from './init-game';
+
+// import game from './init-game';
 
 const TOOLS: Tool[] = [{
   id: 'build',
@@ -30,7 +31,7 @@ export default class App extends React.Component<AppProps, AppState> {
     (window as any).tool = TOOLS[0];
     this.state = {
       tool: TOOLS[0],
-      tasks: game.tasks,
+      // tasks: game.tasks,
     };
   }
 
@@ -73,7 +74,7 @@ interface AppProps { }
 
 interface AppState {
   tool: Tool;
-  tasks: TaskManager;
+  // tasks: TaskManager;
 }
 
 interface Tool {
