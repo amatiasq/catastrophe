@@ -1,7 +1,7 @@
 import Game from '../game';
 import Area from '../world/area';
 import Tile from '../world/tile';
-import { Task, Worker } from './index';
+import { Task, WorkerEntity } from './index';
 
 const MAX_DISTANCE = 10000;
 
@@ -19,7 +19,7 @@ export default class TaskWalk implements Task {
         this.target = area.getCorners()[0];
     }
 
-    isValidWorker(worker: Worker): number {
+    isValidWorker(worker: WorkerEntity): number {
         return MAX_DISTANCE - this.target.estimateDistanceTo(worker.pos);
     }
 
@@ -27,11 +27,11 @@ export default class TaskWalk implements Task {
         return true;
     }
 
-    getTargetForWorker(worker: Worker): Tile {
+    getTargetForWorker(worker: WorkerEntity): Tile {
         return this.target;
     }
 
-    step(worker: Worker): boolean {
+    step(worker: WorkerEntity): boolean {
         this._isCompleted = true;
         return true;
     }

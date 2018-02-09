@@ -4,16 +4,16 @@ import Vector from '../../geometry/vector';
 import notNull from '../../meta/not-null';
 import Game from '../game';
 import Sprite from '../sprite';
-import TaskManager, { Task, Worker } from '../tasks/index';
+import TaskManager, { Task, WorkerEntity } from '../tasks/index';
 import Tile from './tile';
 import Walk from './walk';
 
-export default class Entity extends Sprite implements Worker {
+export default class Entity extends Sprite implements WorkerEntity {
 
     private walking: Walk | null = null;
 
     get isIdle(): boolean {
-        return this.game.tasks.isIdle(this);
+        return this.game.isIdle(this);
     }
 
     get tile() {
@@ -44,7 +44,7 @@ export default class Entity extends Sprite implements Worker {
 
         if (!value) {
             this.walking = null;
-            this.game.tasks.addWorker(this);
+            this.game.addIdleWorker(this);
             return;
         }
 
