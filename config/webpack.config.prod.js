@@ -267,7 +267,7 @@ module.exports = {
         ie8: false,
         ecma: 6,
         warnings: false,
-        mangle: false, // produces errors
+        mangle: true, // debug false
         output: {
           comments: false,
           beautify: false,  // debug true
